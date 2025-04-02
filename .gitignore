@@ -1,2 +1,4 @@
 command.txt
 inventory/
+lab/*.tfstate
+lab/*.tfstate.backup
