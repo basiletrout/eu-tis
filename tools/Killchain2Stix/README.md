@@ -1,10 +1,4 @@
-
-▗▖ ▗▖▄ █ █ ▗▞▀▘▐▌▗▞▀▜▌▄ ▄▄▄▄      ▗▄▄▄▖▄▄▄       ▗▄▄▖ ■  ▄ ▄   ▄     
-▐▌▗▞▘▄ █ █ ▝▚▄▖▐▌▝▚▄▟▌▄ █   █       █ █   █     ▐▌ ▗▄▟▙▄▖▄  ▀▄▀      
-▐▛▚▖ █ █ █     ▐▛▀▚▖  █ █   █       █ ▀▄▄▄▀      ▝▀▚▖▐▌  █ ▄▀ ▀▄     
-▐▌ ▐▌█ █ █     ▐▌ ▐▌  █             █           ▗▄▄▞▘▐▌  █           
-                                                     ▐▌              
-                                                                     
+# KILLCHAIN2STIX                                                                          
                                                                      
 ## What is a killchain and what is a STIX2 ? 
 
@@ -23,7 +17,24 @@ https://oasis-open.github.io/cti-documentation/stix/intro
 
 ## What is this script for ? 
 
-It is used to do STIX report from my basics source in a fast and correct way, simply.
+This script idea comes from the Europeean Cybersecurity project named "SOCCER" (Security Operation Centres Capacity Building for European Resilience) which aims to :
+
+- Develop and implement cutting-edge technologies for secure data access (Security Hub) and the sharing of threat intelligence signals (TIS) across European entities, enhancing the capacity to monitor and detect cyber threats.
+- Interconnect and strengthen advanced Security Operation Centres (SOCs) ecosystems in Germany, Hungary, and Romania, with the goal of enhancing cybersecurity resilience at both national and EU levels.
+
+We help this project in part by making these threat intelligence signals of attacks and attackers which are composed by artefacts such as :
+
+- Samples
+    - Poc or Malware
+    - Pcaps
+-  Rules (against the compromission)
+    - Snort
+    - Yara
+    - Audit.d
+- Killchain.md 
+- Report.pdf (about the attack or the attacker)
+
+The script help to build a Stix2 report based on the above elements in a fast and correct way.
 
 ## how it works ? 
 
@@ -70,7 +81,9 @@ To properly use the script, once you are in your virtual environment with stix i
 
 Once the script into the folder you launch the script :
 
-```
+
+It going to take the "killchain.md" file, and if the syntax is correct create a STIX file with the correct killchain and artefacts
+
 python3 Killchain2stix.py --output exemple_name_report.json 
 ```
 
