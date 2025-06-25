@@ -10,7 +10,9 @@ terraform {
 provider "incus" {}
 
 ### NETWORKS ###
-# WAN Network (For Kali & Atomic-Red)
+
+# WAN Network (For Kali & Attacker) #
+
 resource "incus_network" "wan" {
   name = "incus-wan"
   type = "bridge"
@@ -23,7 +25,8 @@ resource "incus_network" "wan" {
   }
 }
 
-# LAN Network (For DVWA & Target)
+# LAN Network (For DVWA & Target & Windows) #
+
 resource "incus_network" "lan" {
   name = "incus-lan"
   type = "bridge"
@@ -36,8 +39,14 @@ resource "incus_network" "lan" {
   }
 }
 
+## Need to create Admin and Interco network for the Trout Machine 
+
+
+
 ### INSTANCES ###
-# (Router/Firewall)
+
+# Router/Firewall #
+
 resource "incus_instance" "router" {
   name    = "Router-Firewall"
   image   = "images:debian/13/cloud"
@@ -122,11 +131,24 @@ config = {
   }
 }
 
-# WAN Instances (Attacker)
-resource "incus_instance" "atomic_red" {
-  name   = "Attacker"
-  image  = "images:debian/13/default"
+## WAN Instances (Kali) ##
+
+# Attacker-Kali #
+
+resource "incus_instance" "kali" {
+  name   = "Attacker-Kali"
+  image  = "images:kali/cloud"
   running = true
+
+ config = {
+    "user.user-data" = <<EOF
+    #cloud-config
+    package_update: true
+    package_upgrade: true
+    packages:
+      - kali-linux-default
+  EOF
+  }
 
   device {
     name      = "eth0"
@@ -138,7 +160,10 @@ resource "incus_instance" "atomic_red" {
   }
 }
 
-# LAN Instances (Windows, DVWA & Target)
+
+## LAN Instances (Windows, DVWA & Target) ##
+
+# WINDOWS # (bug that i need to fix but it's working)
 
 resource "incus_instance" "windows" {
   name   = "Windows"
@@ -146,9 +171,9 @@ resource "incus_instance" "windows" {
   running = true
 
   source_instance = {
-    project   = "default"
-    name   = "windows-template"
-    snapshot   = "winclient-template"
+    project  = "default"
+    name     = "windows-template"
+    snapshot = "winclient-template"
   }
 
   device {
@@ -159,7 +184,9 @@ resource "incus_instance" "windows" {
       "parent"  = incus_network.lan.name
     }
   }
- }
+}
+
+ # DVWA #
 
 resource "incus_instance" "dvwa" {
   name   = "DVWA"
@@ -251,6 +278,7 @@ resource "incus_instance" "dvwa" {
   }
 }
 
+# TARGET #
 
 resource "incus_instance" "target" {
   name   = "Target"
@@ -278,6 +306,5 @@ EOF
     }
   }
 }
-
 
 
