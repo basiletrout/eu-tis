@@ -39,9 +39,31 @@ resource "incus_network" "lan" {
   }
 }
 
-## Need to create Admin and Interco network for the Trout Machine 
+# Interco Network (For Trout-Machine)
+resource "incus_network" "interco" {
+  name = "incus-interco"
+  type = "bridge"
 
+  config = {
+    "ipv4.dhcp" = "true"
+    "ipv4.address" = "100.65.0.1/29"
+    "ipv4.nat"     = "true"
+    "ipv6.address" = "none"
+  }
+}
 
+# Admin Network (For Trout-Machine)
+resource "incus_network" "admin" {
+  name = "incus-admin"
+  type = "bridge"
+
+  config = {
+    "ipv4.dhcp" = "true"
+    "ipv4.address" = "198.18.220.1/24"
+    "ipv4.nat"     = "true"
+    "ipv6.address" = "none"
+  }
+}
 
 ### INSTANCES ###
 
@@ -131,12 +153,67 @@ config = {
   }
 }
 
+resource "incus_instance" "trout" {
+  name   = "Trout-machine"
+  type   = "virtual-machine"
+  image  = "local:trout"
+  running = true
+
+  config = {
+    "security.secureboot" = "false"
+    "user.user-data" = <<EOF
+#cloud-config
+runcmd:
+  - dhclient eth0
+  - dhclient eth2
+  - dhclient eth3
+EOF
+  }
+
+  device {
+    name      = "eth0"
+    type      = "nic"
+    properties = {
+      parent  = incus_network.wan.name
+      nictype = "bridged"
+    }
+  }
+
+  device {
+    name      = "eth1"
+    type      = "nic"
+    properties = {
+      parent  = incus_network.lan.name
+      nictype = "bridged"
+    }
+  }
+
+  device {
+    name      = "eth2"
+    type      = "nic"
+    properties = {
+      parent  = incus_network.interco.name
+      nictype = "bridged"
+    }
+  }
+
+  device {
+    name      = "eth3"
+    type      = "nic"
+    properties = {
+      parent  = incus_network.admin.name
+      nictype = "bridged"
+    }
+  }
+}
+
+
 ## WAN Instances (Kali) ##
 
 # Attacker-Kali #
 
 resource "incus_instance" "kali" {
-  name   = "Attacker-Kali"
+  name   = "Attacker"
   image  = "images:kali/cloud"
   running = true
 
@@ -185,8 +262,6 @@ resource "incus_instance" "windows" {
     }
   }
 }
-
- # DVWA #
 
 resource "incus_instance" "dvwa" {
   name   = "DVWA"
