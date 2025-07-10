@@ -1,5 +1,12 @@
 command.txt
+web/inventory/
 inventory/
 lab/*.tfstate
 lab/*.tfstate.backup
+lab/trout-image
+lab/trout-tofu
 killchains/**/samples
+terraform.tfstate
+terraform.tfstate.backup
+zip
+lab/.terraform/

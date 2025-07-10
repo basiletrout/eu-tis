@@ -1,4 +1,11 @@
-# KILLCHAIN2STIX                                                                          
+
+
+▗▖ ▗▖▄ █ █ ▗▞▀▘▐▌▗▞▀▜▌▄ ▄▄▄▄      ▗▄▄▄▖▄▄▄       ▗▄▄▖ ■  ▄ ▄   ▄     
+▐▌▗▞▘▄ █ █ ▝▚▄▖▐▌▝▚▄▟▌▄ █   █       █ █   █     ▐▌ ▗▄▟▙▄▖▄  ▀▄▀      
+▐▛▚▖ █ █ █     ▐▛▀▚▖  █ █   █       █ ▀▄▄▄▀      ▝▀▚▖▐▌  █ ▄▀ ▀▄     
+▐▌ ▐▌█ █ █     ▐▌ ▐▌  █             █           ▗▄▄▞▘▐▌  █           
+                                                     ▐▌              
+                                                                    
                                                                      
 ## What is a killchain and what is a STIX2 ? 
 
@@ -81,9 +88,7 @@ To properly use the script, once you are in your virtual environment with stix i
 
 Once the script into the folder you launch the script :
 
-
-It going to take the "killchain.md" file, and if the syntax is correct create a STIX file with the correct killchain and artefacts
-
+```
 python3 Killchain2stix.py --output exemple_name_report.json 
 ```
 
