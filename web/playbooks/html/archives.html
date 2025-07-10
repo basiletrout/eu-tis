@@ -21,23 +21,27 @@
         }
 
         body {
-            font-family: 'Nunito Sans', sans-serif;
+
+            font-family: 'Nunito Sans', Arial, Helvetica, sans-serif;
             background-color: #0b225b;
             margin: 0;
-            padding: 0; /* Remove extra padding */
+            padding: 20px 0; /* Add vertical padding */
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh; /* Full viewport height */
+            align-items: flex-start; /* Align to top instead of center */
+            min-height: 100vh; /* Minimum height instead of fixed */
         }
 
         .container {
             max-width: 800px;
             width: 100%;
             background-color: #eaf6ff;
-            padding: 20px;
+
+            padding: 30px 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px 0; /* Add margin to top and bottom */
+            overflow-y: auto; /* Enable vertical scrolling if needed */
         }
 
         h1 {
@@ -136,6 +140,34 @@
             margin: 20px auto 30px;
             width: 60%;
         }
+
+
+        /* Responsive styles for smaller screens */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 15px;
+            }
+
+            .main-title-line, .main-title-sub {
+                font-size: 1.8em;
+            }
+
+            .soccer-logo {
+                max-width: 200px;
+            }
+
+            .archive-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .download-button {
+                margin-top: 10px;
+                align-self: flex-end;
+            }
+        }
+      
     </style>
 </head>
 <body>
@@ -152,20 +184,51 @@
             password = malware
         </p>
 
-        <!-- Dynamic content will be injected here -->
-        <div class="category" id="threat-actors-section">
-            <h2>Threat-Actors</h2>
-            <ul class="archive-list">
-                <!-- Dynamic archive items will be inserted here -->
-            </ul>
-        </div>
 
-        <div class="category" id="products-section">
-            <h2>Products</h2>
-            <ul class="archive-list">
-                <!-- Dynamic archive items will be inserted here -->
-            </ul>
-        </div>
+    <!-- Threat-Actors Category -->
+    <div class="category">
+        <h2>Threat-Actors</h2>
+        <ul class="archive-list">
+                            <li class="archive-item">
+                    <h2>Ransomhub_ransomware.zip</h2>
+                    <a href="/archives/threat-actors/Ransomhub_ransomware.zip" class="download-button" download>Download</a>
+                </li>
+                            <li class="archive-item">
+                    <h2>Akira_ransomware.zip</h2>
+                    <a href="/archives/threat-actors/Akira_ransomware.zip" class="download-button" download>Download</a>
+                </li>
+                            <li class="archive-item">
+                    <h2>Phobos_ransomware.zip</h2>
+                    <a href="/archives/threat-actors/Phobos_ransomware.zip" class="download-button" download>Download</a>
+                </li>
+                            <li class="archive-item">
+                    <h2>Lotus_Blossom.zip</h2>
+                    <a href="/archives/threat-actors/Lotus_Blossom.zip" class="download-button" download>Download</a>
+                </li>
+                    </ul>
+    </div>
+
+    <!-- Products Category -->
+    <div class="category">
+        <h2>Products</h2>
+        <ul class="archive-list">
+                            <li class="archive-item">
+                    <h2>PAN-OS.zip</h2>
+                    <a href="/archives/products/PAN-OS.zip" class="download-button" download>Download</a>
+                </li>
+                            <li class="archive-item">
+                    <h2>Sophos_firewall.zip</h2>
+                    <a href="/archives/products/Sophos_firewall.zip" class="download-button" download>Download</a>
+                </li>
+                            <li class="archive-item">
+                    <h2>Westermo_L210-F2G.zip</h2>
+                    <a href="/archives/products/Westermo_L210-F2G.zip" class="download-button" download>Download</a>
+                </li>
+                            <li class="archive-item">
+                    <h2>Forti-OS.zip</h2>
+                    <a href="/archives/products/Forti-OS.zip" class="download-button" download>Download</a>
+                </li>
+                    </ul>
     </div>
 </body>
 </html>
