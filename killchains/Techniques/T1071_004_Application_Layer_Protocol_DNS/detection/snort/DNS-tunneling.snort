@@ -1,0 +1,99 @@
+network = {
+    checksum_eval = 'none'
+}
+
+stream = { }
+stream_ip = { }
+stream_icmp = { }
+stream_tcp = { }
+stream_udp = { }
+
+http_inspect = { }
+
+dns = { }
+
+ssh = { }
+ssl = { }
+
+wizard = {
+    spells = {
+        { service = 'dns', proto = 'udp', 
+          to_server = { 
+            '|00 01|',
+            '|00 05|',
+            '|00 0c|',
+            '|00 10|',
+            '|00 1c|'
+          }, 
+          to_client = { 
+            '|81 80|',
+            '|81 83|',
+            '|81 82|',
+            '|84 00|'
+          } 
+        },
+        { service = 'dns', proto = 'tcp', 
+          to_server = { 
+            '|00 01|',
+            '|00 05|',
+            '|00 0c|',
+            '|00 10|',
+            '|00 1c|'
+          }, 
+          to_client = { 
+            '|81 80|',
+            '|81 83|',
+            '|81 82|',
+            '|84 00|'
+          } 
+        }
+    }
+}
+
+binder = {
+    { when = { service = 'dns' }, use = { type = 'dns' } },
+    { use = { type = 'wizard' } }
+}
+
+ips = { include = 'DNS-tunneling-detect.snort',
+        variables = {
+            nets = {
+                ANY_ADDRESS = 'any',
+                ATTACKER_ADDR = '198.18.100.212,192.168.68.62,192.168.117.12,10.13.217.122',
+                DNS_SERVER_ADDR = '198.18.100.248,192.168.68.1,198.46.158.57,10.13.217.1',
+                INTERNAL_NET = '198.18.100.248/32,192.168.68.1/32,198.46.158.57/32,10.13.217.1/32',     
+                EXTERNAL_NET = '198.18.100.212/32,192.168.68.62/32,192.168.117.12/32,10.13.217.122/32'   
+            }
+        }
+}
+
+default_classifications =
+{
+    -- Priority 1: Critical threats - Known malicious tools with high confidence
+    { name = 'DNS_tunneling_iodine', priority = 1,
+      text = 'DNS tunneling using iodine tool detected' },
+    { name = 'DNS_tunneling_dnscat2', priority = 1,
+      text = 'DNS tunneling using dnscat2 tool detected' },
+    { name = 'DNS_tunneling_cobaltstrike', priority = 1,
+      text = 'DNS tunneling beaconing behavior consistent with Cobalt Strike' },
+    
+    -- Priority 2: High suspicion - Behavioral patterns indicating tunneling
+    { name = 'DNS_tunneling_beaconing', priority = 2,
+      text = 'DNS beaconing behavior indicating potential tunneling activity' },
+    { name = 'DNS_tunneling_high_frequency', priority = 2,
+      text = 'High frequency DNS queries indicating potential tunneling' },
+    { name = 'DNS_tunneling_payload_abuse', priority = 2,
+      text = 'Excessive DNS payload size indicating data exfiltration' },
+    
+    -- Priority 3: Medium suspicion - Policy violations and anomalies
+    { name = 'DNS_tunneling_policy_violation', priority = 3,
+      text = 'DNS policy violation - suspicious query patterns' },
+    { name = 'DNS_tunneling_anomaly', priority = 3,
+      text = 'DNS query anomaly - potential tunneling indicators' },
+    { name = 'DNS_tunneling_protocol_abuse', priority = 3,
+      text = 'DNS protocol abuse - non-standard usage patterns' },
+    
+    -- Priority 4: Low priority - Informational/baseline
+    { name = 'DNS_normal_activity', priority = 4,
+      text = 'Normal DNS activity - baseline monitoring' }
+}
