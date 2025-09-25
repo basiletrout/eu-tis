@@ -1,0 +1,7 @@
+-w /bin/bash -p x -k process_execution
+-w /usr/bin/wget -p x -k network_tools
+-w /usr/bin/curl -p x -k network_tools
+-w /etc/passwd -p wa -k passwd_changes
+-w /etc/shadow -p wa -k shadow_changes
+-a always,exit -F arch=b64 -S execve -k process_monitoring
+-a always,exit -F arch=b32 -S execve -k process_monitoring

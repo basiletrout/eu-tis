@@ -32,6 +32,9 @@ We help this project in part by making these threat intelligence signals of atta
     - Snort
     - Yara
     - Audit.d
+    - Sigma 
+    - Sysmon 
+    - Fainotify 
 - Killchain.md 
 - Report.pdf (about the attack or the attacker)
 
@@ -39,16 +42,27 @@ The script help to build a Stix2 report based on the above elements in a fast an
 
 ## how it works ? 
 
-### Requirements 
+### Requirements
 
-first you need to create a virtual environment 
-and install stix2 in it 
+First you need to create a virtual environment and install the required dependencies:
 
-```
+```bash
 python3 -m venv myenv
 source myenv/bin/activate
-pip install stix2 
+pip install stix2 pyyaml
 ```
+
+**Required Python packages:**
+- `stix2` - For creating STIX 2.1 objects and bundles
+- `pyyaml` - For parsing Sigma rules in YAML format
+
+**Supported Detection Rule Types:**
+- **YARA** rules (`.yar`, `.yara`)
+- **Snort** rules (`.snort`, `.rules`)
+- **Auditd** rules (`.rules`, `.log`)
+- **Sigma** rules (`.yml`, `.yaml`) 
+- **Sysmon** configurations (`.xml`, `.config`)
+- **Fainotify** rules (`.py`, `.sh`, `.conf`) 
 
 ### Use the script 
 
@@ -80,11 +94,62 @@ To properly use the script, once you are in your virtual environment with stix i
 ```
 
 
-Once the script into the folder you launch the script :
+Once you have the script, you can launch it by specifying the directory containing your data:
 
+```bash
+python3 Killchain2stix.py <directory_path> --output <output_filename>
 ```
-python3 Killchain2stix.py --output exemple_name_report.json 
+
+**Examples:**
+```bash
+# Process the Folder_for_test_example directory and create stix_report.json inside it
+python3 Killchain2stix.py Folder_for_test_example/ --output stix_report.json
+
+# Process current directory (default behavior)
+python3 Killchain2stix.py . --output my_report.json
+
+# Or simply (current directory is default)
+python3 Killchain2stix.py --output my_report.json
 ```
 
 
 It going to take the "killchain.md" file, and if the syntax is correct create a STIX file with the correct killchain and artefacts
+
+### New Features
+
+The script now supports additional detection rule types:
+
+**Extended Directory Structure:**
+```
+.
+├── detection
+│   ├── auditd
+│   ├── snort
+│   ├── yara
+│   ├── sigma              
+│   ├── sysmon            
+│   └── fainotify          
+├── killchain.md
+├── Report.pdf
+└── samples
+    ├── bin
+    └── pcap
+```
+
+**Smart Error Handling:**
+- The script will automatically skip missing rule types
+- Warning messages are displayed for missing directories
+- Processing continues even if some rule types are not present
+- Detailed error reporting for problematic files
+
+**Example Output:**
+```
+Parsing detection rules and artifacts...
+Warning: No Sigma rules found in /path/to/detection/sigma
+Total indicators parsed: 15
+Creating relationships between indicators and attack patterns...
+Total relationships created: 15
+Creating STIX bundle...
+STIX bundle successfully written to output.json
+Bundle contains: 4 attack patterns, 15 indicators, 15 relationships
+```
