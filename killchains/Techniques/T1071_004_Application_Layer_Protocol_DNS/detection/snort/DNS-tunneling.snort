@@ -15,44 +15,8 @@ dns = { }
 ssh = { }
 ssl = { }
 
-wizard = {
-    spells = {
-        { service = 'dns', proto = 'udp', 
-          to_server = { 
-            '|00 01|',
-            '|00 05|',
-            '|00 0c|',
-            '|00 10|',
-            '|00 1c|'
-          }, 
-          to_client = { 
-            '|81 80|',
-            '|81 83|',
-            '|81 82|',
-            '|84 00|'
-          } 
-        },
-        { service = 'dns', proto = 'tcp', 
-          to_server = { 
-            '|00 01|',
-            '|00 05|',
-            '|00 0c|',
-            '|00 10|',
-            '|00 1c|'
-          }, 
-          to_client = { 
-            '|81 80|',
-            '|81 83|',
-            '|81 82|',
-            '|84 00|'
-          } 
-        }
-    }
-}
-
 binder = {
-    { when = { service = 'dns' }, use = { type = 'dns' } },
-    { use = { type = 'wizard' } }
+    { when = { ports = '53' }, use = { type = 'dns' } }
 }
 
 ips = { include = 'DNS-tunneling-detect.snort',

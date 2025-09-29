@@ -2,17 +2,8 @@
 # GENERAL
 # ===================================================================
 
-# 9000000 - Base rule (all DNS)
-alert udp EXTERNAL_NET any <> INTERNAL_NET 53 (
-    msg:"Normal DNS Request Detected - Service Based (logging only)";
-    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
-    classtype:DNS_normal_activity;
-    sid:9000000;
-    rev:2;
-)
-
 # 9000001 - Very Long Subdomain (kept even if never matched)
-alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
     msg:"DNS Tunneling - Very Long Subdomain";
     content:"|01 00|", offset 2, depth 2;
     pcre:"/[a-f0-9]{5,63}\./i";
@@ -24,7 +15,7 @@ alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
 )
 
 # 9000005 - Excessive TXT Queries
-alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
     msg:"DNS Tunneling - Excessive TXT Queries";
     content:"|01 00|", offset 2, depth 2;
     content:"|00 10|";
@@ -36,7 +27,7 @@ alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
 )
 
 # 9000007 - High NXDOMAIN Rate (kept even if never matched)
-alert udp INTERNAL_NET 53 -> EXTERNAL_NET any (
+alert dns INTERNAL_NET 53 -> EXTERNAL_NET any (
     msg:"DNS Tunneling - High NXDOMAIN Rate";
     content:"|81 83|", offset 2, depth 2;
     detection_filter:track by_dst, count 20, seconds 120;
@@ -47,7 +38,7 @@ alert udp INTERNAL_NET 53 -> EXTERNAL_NET any (
 )
 
 # 9000009 - Excessive DNS Payload
-alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
     msg:"DNS Tunneling - Excessive DNS Payload";
     content:"|01 00|", offset 2, depth 2;
     dsize:>200;
@@ -59,7 +50,7 @@ alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
 )
 
 # 9000041 - High Bandwidth Usage
-alert udp EXTERNAL_NET any <> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any <> INTERNAL_NET 53 (
     msg:"DNS Tunneling - High Bandwidth Usage";
     detection_filter:track by_src, count 200, seconds 300;
     reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
@@ -69,7 +60,7 @@ alert udp EXTERNAL_NET any <> INTERNAL_NET 53 (
 )
 
 # 9000043 - DNS over Non-Standard Ports (kept)
-alert udp EXTERNAL_NET any -> INTERNAL_NET !53 (
+alert dns EXTERNAL_NET any -> INTERNAL_NET !53 (
     msg:"DNS Tunneling - DNS Traffic on Non-Standard Port";
     content:"|01 00|", offset 2, depth 2;
     detection_filter:track by_src, count 5, seconds 120;
@@ -84,7 +75,7 @@ alert udp EXTERNAL_NET any -> INTERNAL_NET !53 (
 # ===================================================================
 
 # 9000025 - Rapid beaconing (dnscat2/general)
-alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
     msg:"DNS Tunneling - dnscat2 Multiple Record Types / Session Beaconing";
     content:"|01 00|", offset 2, depth 2;
     detection_filter:track by_src, count 150, seconds 60;
@@ -95,7 +86,7 @@ alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
 )
 
 # 9000026 - Beaconing Behavior (High Volume)
-alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
     msg:"DNS Tunneling - Beaconing Behavior (High Volume)";
     content:"|01 00|", offset 2, depth 2;
     detection_filter:track by_src, count 200, seconds 120;
@@ -106,7 +97,7 @@ alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
 )
 
 # 9000030 - High Frequency Beaconing Behavior
-alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
     msg:"DNS Tunneling - High Frequency Beaconing Behavior";
     content:"|01 00|", offset 2, depth 2;
     detection_filter:track by_src, count 300, seconds 60;
@@ -117,7 +108,7 @@ alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
 )
 
 # 9000033 - Rapid Different Query Types
-alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
     msg:"DNS Tunneling - Rapid Different Query Types";
     content:"|01 00|", offset 2, depth 2;
     detection_filter:track by_src, count 120, seconds 30;
@@ -128,7 +119,7 @@ alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
 )
 
 # 9000039 - Regular Interval Timing Pattern
-alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
     msg:"DNS Tunneling - Regular Interval Timing Pattern";
     content:"|01 00|", offset 2, depth 2;
     detection_filter:track by_src, count 100, seconds 30;
@@ -143,7 +134,7 @@ alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
 # ===================================================================
 
 # 9000014 - Generic 0x9eXX
-alert udp EXTERNAL_NET any <> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any <> INTERNAL_NET 53 (
     msg:"DNS Tunneling - iodine Generic Pattern (0x9eXX)";
     content:"|9e|", offset 2, depth 1;
     detection_filter:track by_src, count 3, seconds 60;
@@ -155,7 +146,7 @@ alert udp EXTERNAL_NET any <> INTERNAL_NET 53 (
 )
 
 # 9000015 - High Volume of Small Packets
-alert udp EXTERNAL_NET any <> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any <> INTERNAL_NET 53 (
     msg:"DNS Tunneling - iodine High Volume of Small Packets";
     dsize:40<>100;
     detection_filter:track by_src, count 20, seconds 60;
@@ -166,7 +157,7 @@ alert udp EXTERNAL_NET any <> INTERNAL_NET 53 (
 )
 
 # 9000016 - Specific Opcodes
-alert udp EXTERNAL_NET any <> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any <> INTERNAL_NET 53 (
     msg:"DNS Tunneling - iodine Specific Patterns (0x9e10/20/30)";
     content:"|9e|", offset 2, depth 1;
     pcre:"/\x9e[\x10\x20\x30]/";
@@ -179,7 +170,7 @@ alert udp EXTERNAL_NET any <> INTERNAL_NET 53 (
 )
 
 # 9000017 - Comprehensive wildcard
-alert udp EXTERNAL_NET any <> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any <> INTERNAL_NET 53 (
     msg:"DNS Tunneling - iodine Comprehensive 0x9eXX Pattern";
     content:"|9e|", offset 2, depth 1;
     detection_filter:track by_src, count 1, seconds 120;
@@ -191,7 +182,7 @@ alert udp EXTERNAL_NET any <> INTERNAL_NET 53 (
 )
 
 # 9000018 - Persistent Port Usage
-alert udp EXTERNAL_NET any <> INTERNAL_NET any (
+alert dns EXTERNAL_NET any <> INTERNAL_NET any (
     msg:"DNS Tunneling - iodine Persistent Port Usage";
     content:"|9e|", offset 2, depth 1;
     detection_filter:track by_src, count 10, seconds 60;
@@ -203,7 +194,7 @@ alert udp EXTERNAL_NET any <> INTERNAL_NET any (
 )
 
 # 9000020 - Unsolicited DNS Responses
-alert udp INTERNAL_NET 53 -> EXTERNAL_NET any (
+alert dns INTERNAL_NET 53 -> EXTERNAL_NET any (
     msg:"DNS Tunneling - iodine Potential Unsolicited Response";
     content:"|00 84|";
     detection_filter:track by_dst, count 1, seconds 10;
@@ -218,7 +209,7 @@ alert udp INTERNAL_NET 53 -> EXTERNAL_NET any (
 # ===================================================================
 
 # 9000022 - dnscat2 Session Marker
-alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
     msg:"DNS Tunneling - dnscat2 Session Marker (e299)";
     content:"|01 00|", offset 2, depth 2;
     content:"e299", nocase;
@@ -231,7 +222,7 @@ alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
 )
 
 # 9000023 - dnscat2 Session Marker (higher threshold)
-alert udp EXTERNAL_NET any -> INTERNAL_NET 53 (
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
     msg:"DNS Tunneling - dnscat2 Session Marker (e299 - repeated)";
     content:"|01 00|", offset 2, depth 2;
     content:"e299", nocase;
