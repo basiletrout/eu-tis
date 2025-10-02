@@ -11,4 +11,5 @@ zip
 lab/.terraform/
 tools/Killchain2Stix/myenv/
 lab/current-experience/incus-setup-lab.tf
-lab/current-experience/*
+lab/current-experience/
+lab/.terraform.lock.hcl
