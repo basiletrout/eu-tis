@@ -1,0 +1,246 @@
+# ===================================================================
+# GENERAL
+# ===================================================================
+
+# 9000001 - Very Long Subdomain (kept even if never matched)
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - Very Long Subdomain";
+    content:"|01 00|", offset 2, depth 2;
+    pcre:"/[a-f0-9]{5,63}\./i";
+    detection_filter:track by_src, count 1, seconds 300;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_anomaly;
+    sid:9000001;
+    rev:2;
+)
+
+# 9000005 - Excessive TXT Queries
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - Excessive TXT Queries";
+    content:"|01 00|", offset 2, depth 2;
+    content:"|00 10|";
+    detection_filter:track by_src, count 3, seconds 120;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_policy_violation;
+    sid:9000005;
+    rev:2;
+)
+
+# 9000007 - High NXDOMAIN Rate (kept even if never matched)
+alert dns INTERNAL_NET 53 -> EXTERNAL_NET any (
+    msg:"DNS Tunneling - High NXDOMAIN Rate";
+    content:"|81 83|", offset 2, depth 2;
+    detection_filter:track by_dst, count 20, seconds 120;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_anomaly;
+    sid:9000007;
+    rev:2;
+)
+
+# 9000009 - Excessive DNS Payload
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - Excessive DNS Payload";
+    content:"|01 00|", offset 2, depth 2;
+    dsize:>200;
+    detection_filter:track by_src, count 5, seconds 60;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_payload_abuse;
+    sid:9000009;
+    rev:2;
+)
+
+# 9000041 - High Bandwidth Usage
+alert dns EXTERNAL_NET any <> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - High Bandwidth Usage";
+    detection_filter:track by_src, count 200, seconds 300;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_high_frequency;
+    sid:9000041;
+    rev:2;
+)
+
+# 9000043 - DNS over Non-Standard Ports (kept)
+alert dns EXTERNAL_NET any -> INTERNAL_NET !53 (
+    msg:"DNS Tunneling - DNS Traffic on Non-Standard Port";
+    content:"|01 00|", offset 2, depth 2;
+    detection_filter:track by_src, count 5, seconds 120;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_protocol_abuse;
+    sid:9000043;
+    rev:2;
+)
+
+# ===================================================================
+# GENERAL (GIAC BEST PRACTICES)
+# ===================================================================
+
+# 9000025 - Rapid beaconing (dnscat2/general)
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - dnscat2 Multiple Record Types / Session Beaconing";
+    content:"|01 00|", offset 2, depth 2;
+    detection_filter:track by_src, count 150, seconds 60;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_beaconing;
+    sid:9000025;
+    rev:2;
+)
+
+# 9000026 - Beaconing Behavior (High Volume)
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - Beaconing Behavior (High Volume)";
+    content:"|01 00|", offset 2, depth 2;
+    detection_filter:track by_src, count 200, seconds 120;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_cobaltstrike;
+    sid:9000026;
+    rev:2;
+)
+
+# 9000030 - High Frequency Beaconing Behavior
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - High Frequency Beaconing Behavior";
+    content:"|01 00|", offset 2, depth 2;
+    detection_filter:track by_src, count 300, seconds 60;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_high_frequency;
+    sid:9000030;
+    rev:2;
+)
+
+# 9000033 - Rapid Different Query Types
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - Rapid Different Query Types";
+    content:"|01 00|", offset 2, depth 2;
+    detection_filter:track by_src, count 120, seconds 30;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_high_frequency;
+    sid:9000033;
+    rev:2;
+)
+
+# 9000039 - Regular Interval Timing Pattern
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - Regular Interval Timing Pattern";
+    content:"|01 00|", offset 2, depth 2;
+    detection_filter:track by_src, count 100, seconds 30;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_beaconing;
+    sid:9000039;
+    rev:2;
+)
+
+# ===================================================================
+# IODINE
+# ===================================================================
+
+# 9000014 - Generic 0x9eXX
+alert dns EXTERNAL_NET any <> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - iodine Generic Pattern (0x9eXX)";
+    content:"|9e|", offset 2, depth 1;
+    detection_filter:track by_src, count 3, seconds 60;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    reference:url,code.kryo.se/iodine;
+    classtype:DNS_tunneling_iodine;
+    sid:9000014;
+    rev:2;
+)
+
+# 9000015 - High Volume of Small Packets
+alert dns EXTERNAL_NET any <> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - iodine High Volume of Small Packets";
+    dsize:40<>100;
+    detection_filter:track by_src, count 20, seconds 60;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_iodine;
+    sid:9000015;
+    rev:2;
+)
+
+# 9000016 - Specific Opcodes
+alert dns EXTERNAL_NET any <> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - iodine Specific Patterns (0x9e10/20/30)";
+    content:"|9e|", offset 2, depth 1;
+    pcre:"/\x9e[\x10\x20\x30]/";
+    detection_filter:track by_src, count 2, seconds 60;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    reference:url,code.kryo.se/iodine;
+    classtype:DNS_tunneling_iodine;
+    sid:9000016;
+    rev:2;
+)
+
+# 9000017 - Comprehensive wildcard
+alert dns EXTERNAL_NET any <> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - iodine Comprehensive 0x9eXX Pattern";
+    content:"|9e|", offset 2, depth 1;
+    detection_filter:track by_src, count 1, seconds 120;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    reference:url,code.kryo.se/iodine;
+    classtype:DNS_tunneling_iodine;
+    sid:9000017;
+    rev:2;
+)
+
+# 9000018 - Persistent Port Usage
+alert dns EXTERNAL_NET any <> INTERNAL_NET any (
+    msg:"DNS Tunneling - iodine Persistent Port Usage";
+    content:"|9e|", offset 2, depth 1;
+    detection_filter:track by_src, count 10, seconds 60;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    reference:url,code.kryo.se/iodine;
+    classtype:DNS_tunneling_iodine;
+    sid:9000018;
+    rev:2;
+)
+
+# 9000020 - Unsolicited DNS Responses
+alert dns INTERNAL_NET 53 -> EXTERNAL_NET any (
+    msg:"DNS Tunneling - iodine Potential Unsolicited Response";
+    content:"|00 84|";
+    detection_filter:track by_dst, count 1, seconds 10;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    classtype:DNS_tunneling_iodine;
+    sid:9000020;
+    rev:2;
+)
+
+# ===================================================================
+# DNSCAT2
+# ===================================================================
+
+# 9000022 - dnscat2 Session Marker
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - dnscat2 Session Marker (e299)";
+    content:"|01 00|", offset 2, depth 2;
+    content:"e299", nocase;
+    detection_filter:track by_src, count 1, seconds 300;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    reference:url,github.com/iagox86/dnscat2;
+    classtype:DNS_tunneling_dnscat2;
+    sid:9000022;
+    rev:2;
+)
+
+# 9000023 - dnscat2 Session Marker (higher threshold)
+alert dns EXTERNAL_NET any -> INTERNAL_NET 53 (
+    msg:"DNS Tunneling - dnscat2 Session Marker (e299 - repeated)";
+    content:"|01 00|", offset 2, depth 2;
+    content:"e299", nocase;
+    detection_filter:track by_src, count 3, seconds 300;
+    reference:url,https://github.com/TroutSoftware/eu-tis/issues/25;
+    reference:url,github.com/iagox86/dnscat2;
+    classtype:DNS_tunneling_dnscat2;
+    sid:9000023;
+    rev:2;
+)
+
+# ===================================================================
+# COBALTSTRIKE
+# ===================================================================
+
+# 9000026 already used above (Beaconing High Volume)
+# Included in GIAC section.
+
+# ===================================================================
+# OZYMANDNS (placeholder, none triggered in your PCAPs)
+# ===================================================================
